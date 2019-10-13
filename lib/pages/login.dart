@@ -18,12 +18,13 @@ class Login extends StatelessWidget {
           alignment: FractionalOffset.bottomCenter,
           child: Column(
             children: <Widget>[
+              Image.asset('images/chefhat.jpg'),
               Container(
                 margin: EdgeInsets.fromLTRB(0, 20, 0, 20),
                 color: Colors.blue,
                 child: Column(
                   children: <Widget>[
-                    Align(child: Text('Username'),alignment: Alignment.centerLeft,),
+                    Align(child: Text('PELER'),alignment: Alignment.centerLeft,),
                     TextField(
                       controller: _user,
                       decoration: InputDecoration(hintText: 'Enter your username'),
