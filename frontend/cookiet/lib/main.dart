@@ -26,7 +26,7 @@ class Cookiet extends StatelessWidget{
          '/Refrigerator': (BuildContext context) => Refrigerator(),
         //  '/SearchResult/': (BuildContext context) => SearchResult('haha'),
       },
-      home: Login(),
+      home: Refrigerator(),
     );
   }
 }
