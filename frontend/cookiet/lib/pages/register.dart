@@ -41,7 +41,7 @@ class _RegisterState extends State<Register> {
     final email = TextFormField(
       keyboardType: TextInputType.emailAddress,
       autofocus: false,
-      controller: _user,
+      controller: _email,
       // initialValue: 'alucard@gmail.com',
       decoration: InputDecoration(
         hintText: 'Email Address',
@@ -86,7 +86,7 @@ class _RegisterState extends State<Register> {
           height: 42.0,
           // color: Colors.yellow,
           onPressed: () {
-            // Navigator.of(context).pushNamedAndRemoveUntil('/Mood', (Route<dynamic>route) => false);
+            Navigator.of(context).pushNamedAndRemoveUntil('/Mood', (Route<dynamic>route) => false);
           },
           // color: Colors.yellow,
           child: Text('Register', style: TextStyle(color: Colors.white)),
@@ -94,13 +94,13 @@ class _RegisterState extends State<Register> {
       ),
     );
 
-    // final forgotLabel = FlatButton(
-    //   child: Text(
-    //     'Forgot password?',
-    //     style: TextStyle(color: Colors.black54),
-    //   ),
-    //   onPressed: () {},
-    // );
+    final accountLabel = FlatButton(
+      child: Text(
+        'Already have an account? Login here!!!',
+        style: TextStyle(color: Colors.black54),
+      ),
+      onPressed: () {},
+    );
 
     // final registerLabel  = FlatButton(
     //   child: Text(
@@ -129,6 +129,7 @@ class _RegisterState extends State<Register> {
             password,
             SizedBox(height: 24.0),
             registerButton,
+            accountLabel
             // forgotLabel,
             // registerLabel
           ],

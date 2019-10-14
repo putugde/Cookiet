@@ -95,7 +95,7 @@ class _LoginState extends State<Login> {
         style: TextStyle(color: Colors.black54),
       ),
       onPressed: () {
-        Navigator.of(context).pushNamed('/Register');
+        Navigator.of(context).pushNamedAndRemoveUntil('/Register', (Route<dynamic>route) => false);
       },
     );
 
