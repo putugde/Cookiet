@@ -1,9 +1,7 @@
 #!/usr/bin/python
 
+actual_data = open('actual_data.csv').read().split('\n')[1:]
 list_of_ingredients = open("ingredients.csv").read().split(',')
-train_data = open('train_with_scores.csv').read().split('\n')[1:]
-
-
 # this function take a line of string as input
 # and returns score from that line
 def get_score(line):
@@ -32,10 +30,10 @@ def get_one_zero(line):
 
 	for i in list_of_ingredients:
 		if(i in ingredients):
-			temp.append(1)
+			temp.append('1')
 			ingredients.remove(i)
 		else:
-			temp.append(0)
+			temp.append('0')
 
 	# count = 0
 	# for i in temp:
@@ -48,11 +46,12 @@ def get_one_zero(line):
 	return result
 
 # print get_one_zero(train_data[0])
-output = open('one_zero.csv', 'w+')
+output = open('actual_one_zero.csv', 'w+')
 lines = []
 
-for line in train_data:
+for line in actual_data:
 	lines.append(get_one_zero(line))
-text_content = open('ingredients.csv').read() + ',score'
+text_content = open('ingredients.csv').read() + ',score\n'
 text_content += '\n'.join(lines)
 output.write(text_content)
+
