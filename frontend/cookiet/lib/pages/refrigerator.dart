@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:cookiet/api/refrigerator_api.dart';
 
 class Refrigerator extends StatefulWidget {
   
@@ -9,9 +10,7 @@ class Refrigerator extends StatefulWidget {
 }
 
 class _RefrigeratorState extends State<Refrigerator> {
-  void _addIngredients(){
-
-  }
+  static var listIngredients;
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +32,7 @@ class _RefrigeratorState extends State<Refrigerator> {
             color: Color(0xff021A2B),
             borderRadius: radius
           ),
-          child: 
-          Column(
+          child: Column(
             children: <Widget>[
               Icon(Icons.dehaze,color: Color(0xffFFF7D6),size: 20,),
               Container(
@@ -44,7 +42,7 @@ class _RefrigeratorState extends State<Refrigerator> {
                 child: RaisedButton(
                   color: Color(0xff00c6b5),
                   child: Text('Add Ingredients',style: TextStyle(fontSize: 23,color: Color(0xff021a2b)),),
-                  onPressed: _addIngredients,
+                  onPressed: () {},
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15)
                   ),
@@ -53,12 +51,24 @@ class _RefrigeratorState extends State<Refrigerator> {
               Container(
                 padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
                 height: 375,
-                child: ListView.builder(
-                  itemCount: 10,      //INI DUMMY
-                  itemBuilder: (context,index){
-                    return AddIngredient();
+                child: FutureBuilder(
+                  future: IngredientsList.getList(),
+                  builder: (context,snapshot){
+                    if (snapshot.error != null){
+                      return Center(child: Text('No Internet Access',style: TextStyle(color: Color(0xff021A2B)),));
+                    }
+                    // if (snapshot.data == null){
+                    //   return Center(child: CircularProgressIndicator());
+                    // }
+                    listIngredients = IngredientsList.list;
+                    return ListView.builder(
+                      itemCount: listIngredients.length,      //INI DUMMY
+                      itemBuilder: (context,index){
+                        return AddIngredient(listIngredients[index]);
+                      },
+                    );
                   },
-                ),
+                )
               ),
             ],
           ),
@@ -145,6 +155,10 @@ class Ingredient extends StatelessWidget {
 }
 
 class AddIngredient extends StatelessWidget {
+  final IngredientData igdata;
+
+  AddIngredient(this.igdata);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -167,7 +181,7 @@ class AddIngredient extends StatelessWidget {
               borderRadius: BorderRadius.circular(15),
               image: DecorationImage(
                 fit: BoxFit.fill,
-                image: AssetImage('images/ayam_broiler.jpg'),
+                image: NetworkImage('https://www.etheral.id/assets/ingredients/'+(igdata.id).toString()+'.jpeg'),
               )
             ),
           ),
@@ -177,7 +191,7 @@ class AddIngredient extends StatelessWidget {
             alignment: Alignment(0,0),
             height: 80,
             constraints: BoxConstraints(maxWidth: 150),
-            child: Text('Ayam Broiler\n(200 gram)',style: TextStyle(
+            child: Text('${igdata.nama[0].toUpperCase()}${igdata.nama.substring(1)}',style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 18,
             ),textAlign: TextAlign.center,),
