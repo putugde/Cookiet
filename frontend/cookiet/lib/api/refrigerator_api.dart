@@ -26,3 +26,24 @@ class IngredientsList {
     }
   }
 }
+
+class Refrigerators{
+  static List refrigeratorItemList;
+
+  static getRefrigeratorDataItem(idUser) async {
+    refrigeratorItemList = List();
+    var response = await http.get('https://www.etheral.id/index.php/api/getKulkas?id_user='+idUser.toString());
+    Map<String, dynamic> map = jsonDecode(response.body);
+    for (var obj in map['data']){
+      refrigeratorItemList.add(RefrigeratorItem(obj['id_ingredients'].toString(), obj['nama'].toString().toUpperCase(),obj['jumlah'].toString()));
+    }
+  }
+}
+
+class RefrigeratorItem{
+  String idBahan;
+  String jumlah;
+  String nama;
+
+  RefrigeratorItem(this.idBahan, this.nama, this.jumlah);
+}

@@ -1,4 +1,7 @@
+import 'package:cookiet/api/login_api.dart';
 import 'package:flutter/material.dart';
+import 'package:cookiet/pages/mood.dart';
+
 // import 'package:login/home_page.dart';
 
 class Login extends StatefulWidget {
@@ -10,11 +13,33 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   static final TextEditingController _user = TextEditingController();
   static final TextEditingController _pass = TextEditingController();
-  // static final TextEditingController _email = TextEditingController();
 
   String get username => _user.text;
   String get password => _pass.text;
-  // String get email => _email.text;
+
+  void _showDialogFailedLogin() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Login Failed"),
+          content: new Text("Invalid Credentials"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
   @override
   Widget build(BuildContext context) {
     final logo = Hero(
@@ -37,8 +62,8 @@ class _LoginState extends State<Login> {
       onPressed: null,
     );
 
-    final email = TextFormField(
-      keyboardType: TextInputType.emailAddress,
+    final unameBox = TextFormField(
+      // keyboardType: TextInputType.emailAddress,
       autofocus: false,
       controller: _user,
       // initialValue: 'alucard@gmail.com',
@@ -72,21 +97,26 @@ class _LoginState extends State<Login> {
           minWidth: 200.0,
           height: 42.0,
           // color: Colors.yellow,
-          onPressed: () {
-            Navigator.of(context).pushNamedAndRemoveUntil('/Mood', (Route<dynamic>route) => false);
+          onPressed: () async {
+            LoginInfo loginInfo = await LoginAPI.login(_user.text, _pass.text);
+            // print(loginInfo);
+            if (loginInfo.success) {  
+              Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Mood(loginInfo),
+                ),
+              );
+            } else {
+              _showDialogFailedLogin();
+            }
+            _user.clear();
+            _pass.clear();
           },
           // color: Colors.yellow,
           child: Text('Log In', style: TextStyle(color: Colors.white)),
         ),
       ),
-    );
-
-    final forgotLabel = FlatButton(
-      child: Text(
-        'Forgot password?',
-        style: TextStyle(color: Colors.black54),
-      ),
-      onPressed: () {},
     );
 
     final registerLabel  = FlatButton(
@@ -109,12 +139,11 @@ class _LoginState extends State<Login> {
             logo,
             titleApp,
             SizedBox(height: 48.0),
-            email,
+            unameBox,
             SizedBox(height: 20.0),
             password,
             SizedBox(height: 24.0),
             loginButton,
-            // forgotLabel,
             registerLabel
           ],
         ),

@@ -1,21 +1,27 @@
+import 'package:cookiet/api/home_api.dart';
+import 'package:cookiet/api/login_api.dart';
+import 'package:cookiet/pages/details.dart';
+import 'package:cookiet/pages/refrigerator.dart';
 import 'package:flutter/material.dart';
 import 'package:cookiet/pages/search_result.dart';
 
 class Home extends StatefulWidget {
+  final LoginInfo userInfo;
   final bool excited;
 
-  Home(this.excited);
+  Home(this.excited,this.userInfo);
 
   @override
-  _HomeState createState() => _HomeState(this.excited);
+  _HomeState createState() => _HomeState(this.excited, this.userInfo);
 }
 
 class _HomeState extends State<Home> { 
   static var _searchIcon = Icons.search;
+  final LoginInfo userInfo;
   static var _title = Container(child:Text('COOKIET',style: TextStyle(color: Colors.white,)));
   final TextEditingController _query = TextEditingController();
   final bool excited;
-  _HomeState(this.excited);
+  _HomeState(this.excited, this.userInfo);
 
   void _onPressedSearch(){
     setState(() {
@@ -77,7 +83,7 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
-      body: HomeBody(excited),
+      body: HomeBody(excited,this.userInfo),
       bottomNavigationBar: Container(
         color: Color(0xff021A2B),
         height: 50,
@@ -93,7 +99,16 @@ class _HomeState extends State<Home> {
               ),
               IconButton(
                 icon: Icon(Icons.kitchen,color: Colors.white),
-                onPressed: () {Navigator.of(context).pushNamed('/Refrigerator');},
+                onPressed: () {
+
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Refrigerator(this.userInfo),
+                    ),
+                  );
+                  Navigator.of(context).pushNamed('/Refrigerator');
+                },
               ),
               IconButton(
                 icon: Icon(Icons.account_circle,color: Colors.white),
@@ -109,80 +124,113 @@ class _HomeState extends State<Home> {
 
 class HomeBody extends StatefulWidget {
   final bool exc;
+  final LoginInfo userInfo;
 
-  HomeBody(this.exc);
+
+  HomeBody(this.exc, this.userInfo);
   @override
-  _HomeBodyState createState() => _HomeBodyState(exc);
+  _HomeBodyState createState() => _HomeBodyState(exc, this.userInfo);
 }
 
 class _HomeBodyState extends State<HomeBody> {
   final bool exc;
-  _HomeBodyState(this.exc);
+  final LoginInfo userInfo;
+
+  _HomeBodyState(this.exc, this.userInfo);
+
+
   @override
   Widget build(BuildContext context) {
+    int mood = exc?1:0;
     return Container(
       // color: Colors.green,
       margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
       color: Color(0xff00C6B5),
-      child: ListView.builder(
-        itemCount: exc? 2: 4,
-        itemBuilder: (context,index) {
-          // if (index.isOdd) return Divider(color: Colors.red);
-          return FoodHomeContent();
-        },
-      ),
+      child: FutureBuilder(
+        future: HomeAPI.getRecommendation(this.userInfo.idCust, mood),
+        builder: (context, snapshot) {
+          print(this.userInfo.idCust);
+          if (snapshot.error != null){
+            return Center(child: Text(snapshot.error.toString(),style: TextStyle(color: Color(0xff021A2B)),));
+          }
+          return ListView.builder(
+            itemCount: HomeAPI.listRecommendation.length,
+            itemBuilder: (context,index) {
+              // if (index.isOdd) return Divider(color: Colors.red);
+              return FoodHomeContent(HomeAPI.listRecommendation[index],this.userInfo);
+            },
+          );
+        } 
+      )
     );
   }
 }
 
 class FoodHomeContent extends StatelessWidget {
+  final Recipe recipeFromApi;
+  final LoginInfo userInfo;
+
+  FoodHomeContent(this.recipeFromApi,this.userInfo);
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 125,
-      margin: EdgeInsets.fromLTRB(10, 10, 10, 10),
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.circular(15),
-        color: Color(0xffFFF7D6),
-      ),
-      child: Row(
-        children: <Widget>[
-          Container(
-            height: 80,
-            width: 80,
-            decoration: BoxDecoration(
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(15),
-              image: DecorationImage(
-                fit: BoxFit.fill,
-                image: AssetImage('images/food_dummy.jpg'),
-              )
-            ),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Details(recipeFromApi.id.toString(),userInfo.idCust.toString()),
           ),
-          Container(
-            // color: Colors.yellow,
-            margin: EdgeInsets.all(10),
-            child: Column(
-              children: <Widget>[
-                Container(
-                  margin: EdgeInsets.fromLTRB(0, 0, 0, 5),
-                  width: MediaQuery.of(context).size.width-160,
-                  // color: Colors.purpleAccent,
-                  child: Text('NASI GORENG TELOR',style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.left),
-                ),
-                Container(
-                  // color: Colors.cyan,
-                  width: MediaQuery.of(context).size.width-160,
-                  height: 64, 
-                  child: Text('Nasi goreng paling enak di jagat raya, dibuat dengan cinta. Nasi goreng paling enak di jagat raya, dibuat dengan cinta. Nasi goreng paling enak di jagat raya, dibuat dengan cinta.', textAlign: TextAlign.left),
-                ),
-              ],
+        );
+      },
+      child:Container(
+        height: 125,
+        margin: EdgeInsets.fromLTRB(10, 10, 10, 10),
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(15),
+          color: Color(0xffFFF7D6),
+        ),
+        child: Row(
+          children: <Widget>[
+            Container(
+              height: 80,
+              width: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(15),
+                image: DecorationImage(
+                  fit: BoxFit.fill,
+                  image: NetworkImage('https://www.etheral.id/assets/recipes/'+this.recipeFromApi.id.toString()+'.jpeg'),
+                )
+              ),
             ),
-          )
-        ],
-      ),
+            Container(
+              // color: Colors.yellow,
+              margin: EdgeInsets.all(10),
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.fromLTRB(0, 0, 0, 5),
+                    width: MediaQuery.of(context).size.width-160,
+                    // color: Colors.purpleAccent,
+                    child: Text(this.recipeFromApi.nama.trim().toUpperCase(),style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.left),
+                  ),
+                  Container(
+                    // color: Colors.cyan,
+                    width: MediaQuery.of(context).size.width-160,
+                    height: 64, 
+                    child: Text(this.recipeFromApi.desc.trim(), textAlign: TextAlign.left),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ) ,
     );
+    
+    ;
   }
 }

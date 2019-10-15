@@ -1,16 +1,24 @@
+import 'package:cookiet/api/login_api.dart';
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:cookiet/api/refrigerator_api.dart';
 
 class Refrigerator extends StatefulWidget {
+
+  LoginInfo userInfo;
+
+  Refrigerator(this.userInfo);
   
 
   @override
-  _RefrigeratorState createState() => _RefrigeratorState();
+  _RefrigeratorState createState() => _RefrigeratorState(this.userInfo);
 }
 
 class _RefrigeratorState extends State<Refrigerator> {
   static var listIngredients;
+  LoginInfo userInfo;
+
+  _RefrigeratorState(this.userInfo);
 
   @override
   Widget build(BuildContext context) {
@@ -57,9 +65,11 @@ class _RefrigeratorState extends State<Refrigerator> {
                     if (snapshot.error != null){
                       return Center(child: Text('No Internet Access',style: TextStyle(color: Color(0xff021A2B)),));
                     }
-                    // if (snapshot.data == null){
+                    
+                    // if (IngredientsList.list == null){
                     //   return Center(child: CircularProgressIndicator());
                     // }
+
                     listIngredients = IngredientsList.list;
                     return ListView.builder(
                       itemCount: listIngredients.length,      //INI DUMMY
@@ -86,12 +96,19 @@ class _RefrigeratorState extends State<Refrigerator> {
         body: Container(
           color: Color(0xff00C6B5),
           padding: EdgeInsets.fromLTRB(15, 0, 15, 140),
-          child: ListView.builder(
-            itemCount: 10,      //INI DUMMY
-            itemBuilder: (context,index){
-              return Ingredient();
+          child: FutureBuilder(
+            future: Refrigerators.getRefrigeratorDataItem(this.userInfo.idCust.toString()),
+            builder: (context, snapshot){
+              return ListView.builder(
+                itemCount: 10,      //INI DUMMY
+                itemBuilder: (context,index){
+                  return Ingredient(Refrigerators.refrigeratorItemList[index]);
+                },
+              );
             },
-          ),
+          )
+          
+          
         ),
         borderRadius: radius,
         minHeight:60
@@ -101,6 +118,10 @@ class _RefrigeratorState extends State<Refrigerator> {
 }
 
 class Ingredient extends StatelessWidget {
+  final RefrigeratorItem itemKulkas;
+  
+  Ingredient(this.itemKulkas);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -123,7 +144,7 @@ class Ingredient extends StatelessWidget {
               borderRadius: BorderRadius.circular(15),
               image: DecorationImage(
                 fit: BoxFit.fill,
-                image: AssetImage('images/ayam_broiler.jpg'),
+                image: NetworkImage('https://www.etheral.id/assets/ingredients/'+itemKulkas.idBahan.toString()+'.jpeg'),
               )
             ),
           ),
@@ -133,7 +154,7 @@ class Ingredient extends StatelessWidget {
             margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
             height: 80,
             constraints: BoxConstraints(maxWidth: 200),
-            child: Text('Ayam Broiler\n(200 gram)',style: TextStyle(
+            child: Text(this.itemKulkas.nama,style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 23,
             ),textAlign: TextAlign.center,),
@@ -143,7 +164,7 @@ class Ingredient extends StatelessWidget {
             width: 50,
             // color: Colors.orange,
             height: 80,
-            child: Text('200', style: TextStyle(
+            child: Text(this.itemKulkas.jumlah, style: TextStyle(
               fontWeight: FontWeight.w700,
               fontSize: 25,
             ),textAlign:TextAlign.center,),

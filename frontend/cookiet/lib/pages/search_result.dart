@@ -18,7 +18,7 @@ class SearchResult extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
         child: FutureBuilder(
           future: SearchResultAPI.getList(_searchKey),
-          builder: (context, snapshot){
+          builder: (context, snapshot) {
             if (snapshot.error != null){
               return Center(child: Text('No Internet Access',style: TextStyle(color: Color(0xff021A2B)),));
             }
@@ -26,7 +26,7 @@ class SearchResult extends StatelessWidget {
             queryResultList = List();
             queryResultList = SearchResultAPI.list;
             return ListView.builder(
-              itemCount: queryResultList.length,
+              itemCount: (queryResultList.length / 2).round(),
               itemBuilder: (context,index) {
                 return FoodHomeContent(queryResultList[index]);
               }
