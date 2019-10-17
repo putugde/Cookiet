@@ -1,3 +1,5 @@
+import 'package:cookiet/api/register_api.dart';
+import 'package:cookiet/pages/mood.dart';
 import 'package:flutter/material.dart';
 
 
@@ -27,9 +29,50 @@ class _RegisterState extends State<Register> {
       ),
     );
 
+    void _showDialogFailedRegister() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Register Failed"),
+          content: new Text("Username has been taken, or no internet access."),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showCircularLoading() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Please Wait"),
+          content: new Text("Please wait, register is in progress"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new CircularProgressIndicator(),
+          ],
+        );
+      },
+    );
+  }
+
     final titleApp = FlatButton(
       child: Text(
-        'Register Cookiet',
+        'REGISTER COOKIET',
         style: TextStyle(
           color: Colors.black54,
           fontSize: 24
@@ -85,8 +128,24 @@ class _RegisterState extends State<Register> {
           minWidth: 200.0,
           height: 42.0,
           // color: Colors.yellow,
-          onPressed: () {
-            Navigator.of(context).pushNamedAndRemoveUntil('/Mood', (Route<dynamic>route) => false);
+          onPressed: () async {
+            _showCircularLoading();
+            var loginInfo = await RegisterAPI.register(_user.text, _email.text, _pass.text);
+            if (loginInfo.success){
+              Navigator.of(context).pop();
+              Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Mood(loginInfo),
+                ),
+              );
+            } else {
+              Navigator.of(context).pop();
+              _showDialogFailedRegister();
+              _user.clear();
+              _email.clear();
+              _pass.clear();
+            }
           },
           // color: Colors.yellow,
           child: Text('Register', style: TextStyle(color: Colors.white)),
@@ -96,21 +155,13 @@ class _RegisterState extends State<Register> {
 
     final accountLabel = FlatButton(
       child: Text(
-        'Already have an account? Login here!!!',
+        'Already have an account? Login here !',
         style: TextStyle(color: Colors.black54),
       ),
-      onPressed: () {},
+      onPressed: () {
+        Navigator.of(context).pushNamedAndRemoveUntil('/Login', (Route<dynamic>route) => false);
+      },
     );
-
-    // final registerLabel  = FlatButton(
-    //   child: Text(
-    //     'Dont have account? Register here!!!',
-    //     style: TextStyle(color: Colors.black54),
-    //   ),
-    //   onPressed: () {
-    //     Navigator.of(context).pushNamed('/Register');
-    //   },
-    // );
 
     return Scaffold(
       backgroundColor: Color(0xfffff7D6),

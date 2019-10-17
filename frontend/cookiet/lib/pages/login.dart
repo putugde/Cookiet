@@ -39,6 +39,23 @@ class _LoginState extends State<Login> {
       },
     );
   }
+
+  void _showCircularLoadingLogin() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Logging In"),
+          content: new Text("Please wait..."),
+          actions: <Widget>[
+            CircularProgressIndicator(),
+          ],
+        );
+      },
+    );
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -98,9 +115,11 @@ class _LoginState extends State<Login> {
           height: 42.0,
           // color: Colors.yellow,
           onPressed: () async {
+            _showCircularLoadingLogin();
             LoginInfo loginInfo = await LoginAPI.login(_user.text, _pass.text);
             // print(loginInfo);
             if (loginInfo.success) {  
+              Navigator.of(context).pop();
               Navigator.push(
               context,
               MaterialPageRoute(
@@ -108,6 +127,7 @@ class _LoginState extends State<Login> {
                 ),
               );
             } else {
+              Navigator.of(context).pop();
               _showDialogFailedLogin();
             }
             _user.clear();

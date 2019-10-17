@@ -1,9 +1,7 @@
-import 'package:cookiet/pages/details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cookiet/pages/login.dart';
 import 'package:cookiet/pages/register.dart';
-import 'package:cookiet/pages/refrigerator.dart';
 
 void main() => runApp(Cookiet());
 
